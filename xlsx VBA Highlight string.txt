@@ -1,0 +1,43 @@
+<#
+Press Alt + F11 to open the VBA editor.
+Go to Insert → Module.
+Paste the code above.
+Press F5 to run, or assign it to a button.
+Select the range when prompted.
+#>
+
+Sub HighlightToString()
+    Dim rng As Range
+    Dim cell As Range
+    Dim startPos As Long
+    Dim searchText As String
+    
+    ' Text to highlight
+    searchText = " - to - "
+    
+    ' Prompt user to select range
+    On Error Resume Next
+    Set rng = Application.InputBox("Select range to search:", "Highlight Partial Text", Type:=8)
+    On Error GoTo 0
+    
+    If rng Is Nothing Then Exit Sub
+    
+    Application.ScreenUpdating = False
+    
+    For Each cell In rng
+        If Not IsError(cell.Value) And Len(cell.Value) > 0 Then
+            startPos = InStr(1, cell.Value, searchText, vbTextCompare)
+            If startPos > 0 Then
+                ' Clear previous formatting
+                cell.Font.ColorIndex = xlAutomatic
+                cell.Characters(startPos, Len(searchText)).Font.Color = vbRed
+                cell.Characters(startPos, Len(searchText)).Font.Bold = True
+                ' Optional: background color for substring
+                ' Note: Excel does not support background color for partial text directly
+                ' Only font color/bold/italic can be applied to part of a cell
+            End If
+        End If
+    Next cell
+    
+    Application.ScreenUpdating = True
+End Sub
